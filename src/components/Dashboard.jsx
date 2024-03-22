@@ -1,7 +1,9 @@
 import React from "react";
-
-function Dashboard() {
-  return <div>Dashboard</div>;
+import SideAndNav from "./SideAndNav";
+export default function Dashboard() {
+  return (
+    <>
+      <SideAndNav />
+    </>
+  );
 }
-
-export default Dashboard;

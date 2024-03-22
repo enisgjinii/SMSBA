@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import axios from "axios";
+import { ToastContainer, toast } from "react-toastify"; // Import from react-toastify
+import "react-toastify/dist/ReactToastify.css"; // Import the CSS for styling
 
 const Login = () => {
   const location = useLocation();
@@ -22,21 +24,55 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     try {
+      // Input validation
+      if (!formData.username || !formData.password) {
+        toast.error("Please fill in all fields.", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: true,
+        });
+        return;
+      }
+
+      // Show success toast first
+      toast.success("Logging you in...", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: true,
+      });
+
+      await new Promise((resolve) => setTimeout(resolve, 3000)); // Wait 3 seconds
+
+      // Sanitize inputs to prevent SQL injection
+      const sanitizedFormData = {
+        username: formData.username.replace(/[&'"<>]/g, ""), // Remove potentially harmful characters
+        password: formData.password, // Assuming password hashing is done securely on the server
+      };
+
       const response = await axios.post(
         "http://localhost:5000/api/login",
-        formData
+        sanitizedFormData
       );
+
       console.log(response.data);
-      handleLoginSuccess(response.data.token); // Assuming the API returns a token
+      handleLoginSuccess(response.data.token);
     } catch (error) {
       console.error("Error signing in: ", error);
       setError("Invalid username or password");
+
+      toast.error("Invalid credentials. Please try again.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: true,
+      });
     }
   };
 
   return (
     <div className="flex justify-center items-center h-screen bg-gray-100">
+      <ToastContainer /> {/* Render ToastContainer here */}
       <div className="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
         <h2 className="text-2xl font-semibold text-center text-gray-800 mb-6">
           Welcome Back!
